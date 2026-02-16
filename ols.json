@@ -5,15 +5,15 @@
   "collections": [
     {
       "name": "core",
-      "path": "/tools/Odin/core"
+      "path": "~/tools/Odin/core"
     },
     {
       "name": "vendor",
-      "path": "/tools/Odin/vendor"
+      "path": "~/tools/Odin/vendor"
     },
     {
       "name": "base",
-      "path": "/tools/Odin/base"
+      "path": "~/tools/Odin/base"
     }
     // Add custom collections here, e.g., "shared": "/path/to/my/libs"
   ],
