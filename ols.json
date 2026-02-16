@@ -1,0 +1,59 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/ols.schema.json",
+
+  // 1. COLLECTIONS (Crucial: Update these paths to your system!)
+  "collections": [
+    {
+      "name": "core",
+      "path": "/tools/Odin/core"
+    },
+    {
+      "name": "vendor",
+      "path": "/tools/Odin/vendor"
+    },
+    {
+      "name": "base",
+      "path": "/tools/Odin/base"
+    }
+    // Add custom collections here, e.g., "shared": "/path/to/my/libs"
+  ],
+
+  // 2. CORE PERFORMANCE SETTINGS
+  // Set to false because Doom Emacs/Tree-sitter usually handles this better/faster
+  "enable_semantic_tokens": false,
+
+  // Only runs the checker when you save, rather than on every keystroke (saves CPU)
+  "enable_checker_only_saved": true,
+
+  // 3. FEATURE TOGGLES (The "Bells & Whistles")
+  "enable_hover": true,               // Shows type info when hovering over variables
+  "enable_document_symbols": true,     // Allows SPC s i to list all functions in file
+  "enable_snippets": true,             // Enables LSP-driven code snippets
+  "enable_procedure_snippet": true,    // Adds () automatically after procedure completion
+  "enable_references": true,           // Essential for "Find References"
+  "enable_format": true,               // Allows OLS to format your code on save
+  "enable_rename": true,               // Safely rename variables across the project
+
+  "spaces_around_colons": true,
+
+  // 4. MODERN UI ENHANCEMENTS (Inlay Hints)
+  "enable_inlay_hints_params": true,           // Shows parameter names in function calls
+  "enable_inlay_hints_default_params": false,  // Set to true if you want to see hidden defaults
+  "enable_inlay_hints_implicit_return": true,  // Shows what a function returns even if implicit
+
+  // 5. COMPILER & ARGUMENTS
+  // Pass extra flags to the background 'odin check'
+  "checker_args": "-vet -strict-style -disallow-do",
+
+  // Specify your odin path if it's not in your global PATH
+  // "odin_command": "/home/YOUR_USER/odin/odin",
+
+  // 6. EXPERIMENTAL (Keep off unless you're feeling brave)
+  "enable_fake_methods": false,        // Experimental "dot-call" style completion
+  "verbose": false                      // Keep false to avoid cluttering LSP logs
+}
+
+
+/*Conflict Warning: If you notice Emacs getting laggy when you open a large Odin file,
+  the first thing to flip to false is enable_inlay_hints_params. They are cool but can
+  be heavy on the LSP.*/

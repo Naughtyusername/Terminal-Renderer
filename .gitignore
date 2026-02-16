@@ -1,0 +1,30 @@
+# Build artifacts
+.clang_complete
+.clangd
+*.cache
+compile_commands.json
+.build/
+*.elf
+*.idx
+*.log
+*.lss
+*.lst
+*.map
+*.o
+*.stackdump
+*.sym
+
+# QMK-specific
+*.bin
+*.eep
+*.hex
+*.qmk
+*.uf2
+
+# Secret files
+secrets.c
+secrets.h
+secrets.el
+
+# Secret files (private information)
+users/naughtyusername/secrets.h
