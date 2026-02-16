@@ -1,7 +1,7 @@
 package terminal_renderer
 
 import "core:os"
-import "core:sys/unix"
+import "core:sys/posix"
 
 Cell :: struct {
 	ch:    rune, // Unicode character (@ for player, # for wall, etc.)
@@ -52,26 +52,26 @@ clear_buffer :: proc(buf: ^Buffer, ch: rune = ' ', fg, bg: Color) {
 }
 
 Terminal :: struct {
-    width:        int,
+    width:         int,
     height:        int,
-
     // Double buffering
     front:        Buffer, // What's currently on screen
     back:         Buffer, // What we're drawing to
 
     // Terminal I/O
-    stdin:        os.Handle,
-    stdout:       os.Handle,
+    //stdin_fd:        posix.FD,
+    //stdout_fd:       posix.FD,
+    stdin_fd:     int, // 0 for stdin, 1 for stdout, 2 for stderr
 
     // State
     cursor_vis:   bool,
     mouse_mode:   bool,
-    orig_term:    termios,  // Original terminal settings ( restore on exit )
+    orig_term:    posix.termios,  // Original terminal settings ( restore on exit )
 }
 
 enable_raw_mode :: proc(term: ^Terminal) {
     // Get current terminal settings
-    unix.tcgetattr(term.stdin, &term.orig_term)
+    posix.tcgetattr(posix.FD(0), &term.orig_term) // 0 = stdin
 
     // Copy and modify
     raw := term.orig_term
@@ -81,25 +81,29 @@ enable_raw_mode :: proc(term: ^Terminal) {
     // - ICANON (no line buffering)
     // - ISIG ( no Ctrl+C signal )
     // - IEXTEN ( no Ctrl+V literal next )
-    raw.c_lflag &= ~(unix.ECHO | unix.ICANON | unix.ISIG | unix.IEXTEN)
+    // Local flags
+    raw.c_lflag -= {.ECHO, .ICANON, .ISIG, .IEXTEN}
 
+    // Input flags
     // Disable input processing (CRLF conversion)
-    raw.c_iflag &= ~(unix.IXON | unix.ICRNL | unix.INPCK | unix.ISTRIP)
+    raw.c_iflag -= {.IXON, .ICRNL, .INPCK, .ISTRIP}
 
+    // Output flags
     // Disable output processing (\n -> \r\n)
-    raw.c_oflag &= ~(unix.OPOST)
+    raw.c_oflag -= {.OPOST}
 
+    // Control flags
     // Set read to return immediately with any input
-    raw.c_cc[unix.VMIN] = 0   // Min chars to read
-    raw.c_cc[unix.VTIME] = 0  // Timeout in 0.1s (0 = no timeout)
+    raw.c_cc[.VMIN] = 0   // Min chars to read
+    raw.c_cc[.VTIME] = 0  // Timeout in 0.1s (0 = no timeout)
 
     // Apply settings
-    unix.tcsetattr(term.stdin, unix.TCSAFLUSH, &raw)
+    posix.tcsetattr(posix.FD(0), .TCSAFLUSH, &raw)
 }
 
 disable_raw_mode :: proc(term: ^Terminal) {
     // Restore original settings
-    unix.tcsettattr(term.stdin, unix.TCSAFLUSH, &term.orig_term)
+    posix.tcsetattr(posix.FD(0), .TCSAFLUSH, &term.orig_term)
 }
 
 // Critical Always restore terminal on exit!
@@ -107,7 +111,7 @@ main :: proc() {
     term := init_terminal()
     defer cleanup_terminal(&term) // Restores cooked mode
 
-    // Game loop...
+    // Game ioop...
 }
 // If you don't restore and the program crashes, your terminal will be unsuable (no echo, weird input)
 
